@@ -1,0 +1,24 @@
+module Sieve;
+
+def List<Int> main(Int m) =
+  let (List<Int> oddnumbers) = listgenerator(m, 3, Nil) in Cons(2, primes(m, oddnumbers));
+
+def List<Int> listgenerator(Int m, Int initialize, List<Int> result) =
+  if(initialize > m) then reverse(result) else listgenerator(m, initialize+2, Cons(initialize, result));
+
+def List<Int> primes(Int m, List<Int> oddnumbers) =
+  case oddnumbers{
+      Cons(p, xs) => if(p*p < m) then Cons(p, primes(m, remover(xs, multiples(p*p, m, Nil, 2*p)))) else oddnumbers;
+  };
+
+def List<Int> multiples(Int initialize, Int m, List<Int> result, Int incr) =
+    if(initialize > m) then reverse(result) else multiples(initialize+incr, m, Cons(initialize,result), incr);
+
+def List<Int> remover(List<Int>oddnumbers, List<Int>multiples) =
+  case oddnumbers{
+      Nil => Nil;
+      Cons(x,xs) => case multiples{
+        Nil => oddnumbers;
+        Cons(m,ms) => if(x < m) then Cons(x, remover(xs, multiples)) else if(x==m) then remover(xs, ms) else remover(oddnumbers, ms);
+      };
+  };

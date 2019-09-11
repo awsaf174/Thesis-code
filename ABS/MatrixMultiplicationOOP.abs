@@ -1,0 +1,63 @@
+module MatmulOOP;
+
+interface Matmul{
+  List<List<Int>> matmul(List<List<Int>>matrixOne, List<List<Int>>matrixTwo);
+  List<List<Int>> transpose(List<List<Int>>matrix);
+}
+
+class MatmulImpl implements Matmul{
+  List<List<Int>> res = Nil;
+  List<List<Int>> matmul(List<List<Int>> matrixOne, List<List<Int>> matrixTwo){
+    matrixTwo = this.transpose(matrixTwo);
+    res = this.multiply(matrixOne, matrixOne);
+    return res;
+  }
+
+  List<List<Int>> multiply(List<List<Int>>matrixOne, List<List<Int>>matrixTwo ){
+    List<List<Int>>temp1 = matrixOne;
+    List<List<Int>>temp2 = matrixTwo;
+    List<List<Int>>tempres = Nil;
+    while(length(temp1)>0){
+      while(length(temp2 >0){
+        tempres = Cons(head(temp1)*head(temp2), tempres);
+        temp2 =
+      }
+    }
+
+  }
+
+  List<List<Int>> transpose(List<List<Int>>matrix){
+
+    List<List<Int>> result = Nil;
+    List<Int> temp = Nil;
+    List<List<Int>> tempres = Nil;
+    while(length(matrix)>0){
+      temp = head(matrix);
+      if(result == Nil){
+        result = Cons(list[head(temp)], list[tail(temp)]);
+      }
+      else{
+        result = Cons(Cons(head(temp), head(result)), Cons(Cons(head(tail(temp)), head(tail(result))), Nil));
+      }
+      matrix = tail(matrix);
+    }
+    while(length(result) >0){
+      tempres = Cons(reverse(head(result)), tempres);
+      result = tail(result);
+    }
+    result = reverse(tempres);
+
+    return result;
+  }
+
+
+
+}
+
+
+{
+  List<List<Int>> l = list[list[1,2], list[3,4], list[5,6]];
+  Matmul m = new MatmulImpl();
+  List<List<Int>>lt = m.transpose(l);
+  println(toString(lt));
+}

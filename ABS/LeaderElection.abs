@@ -1,0 +1,87 @@
+module LeaderElection;
+
+def Int numNodes() = 10;
+
+interface Runelection{
+  Unit runelection();
+}
+
+interface Node {
+   Unit setNextNode(Node n);
+   Unit findLeader(Node currentLeader, Int leaderId);
+   Unit electLeader();
+   Unit start();
+}
+class RunelectionImpl implements Runelection {
+  List<Node> nodes = Nil;
+  Int num = numNodes();
+
+  Node prevNode;
+  Node n;
+  Node first;
+
+  Unit runelection(){
+   first = new NodeImpl(0);
+   prevNode = first;
+
+   Int id = 1;
+   while (id <= num) {
+      n = new NodeImpl(id);
+      n!setNextNode(prevNode);
+      prevNode = n;
+      nodes = Cons(n,nodes);
+      id = id +1;
+   }
+   assert first != null;
+   first!setNextNode(n);
+   first!start();
+   id = 1;
+   nodes = Nil;
+  }
+}
+class NodeImpl(Int id) implements Node {
+   Node next;
+   Bool electionRunning = False;
+   Node leader;
+
+   Unit start(){
+    await this!electLeader();
+    await this.electionRunning == False;
+   }
+
+   Unit setNextNode(Node n) {
+      next = n;
+   }
+
+   Unit electLeader() {
+      await electionRunning == False;
+      electionRunning = True;
+      await next != null;
+      next!findLeader(this,id);
+   }
+
+
+   Unit findLeader(Node currentLeader, Int leaderId) {
+      await next != null;
+      if (id > leaderId) {
+         leader = this;
+         next!findLeader(this,id);
+      } else if (id == leaderId) {
+         electionRunning = False;
+         println(toString(leaderId));
+      } else {
+         leader = currentLeader;
+         next!findLeader(currentLeader, leaderId);
+      }
+   }
+}
+
+{
+  Int i = 1000;
+  Runelection re = new RunelectionImpl();
+  while(i>0){
+    re!runelection();
+    i = i-1;
+  }
+
+}

@@ -1,0 +1,104 @@
+module TokenRingMod;
+
+def Int numNodes() = 40;
+interface Runtokenring{
+  Node test();
+}
+interface Node {
+   Unit setNextNode(Node n);
+   Unit setTokenAtt();
+   Unit isFinished();
+   Int getId();
+   //Unit start();
+}
+
+interface Server{
+  Unit resources(Int id);
+}
+
+class RuntokenringImpl implements Runtokenring{
+  List<Node> nodes = Nil;
+  Int num = numNodes();
+  Server s;
+  Node nextNode;
+  Node n;
+  Node first;
+  Node test(){
+    s = new ServerImpl();
+    first = new NodeImpl(0, s);
+  	nextNode = first;
+  	Int id = num-1;
+  	while (id > 0) {
+      n = new NodeImpl(id, s);
+      n!setNextNode(nextNode);
+      nextNode = n;
+      nodes = Cons(n,nodes);
+      id = id -1;
+   }
+   assert first != null;
+   first!setNextNode(n);
+   first!setTokenAtt();
+   Int len = length(nodes) - 1;
+   n = nth(nodes, len);
+   nodes = Nil;
+   return n;
+  }
+  //Unit run(){
+    //println("running");
+  //}
+}
+class ServerImpl implements Server{
+  Unit resources(Int id){
+    //println("resources accessed by node: " + toString(id));
+  }
+}
+
+class NodeImpl(Int id, Server s) implements Node {
+
+  Bool finished = False;
+  Node next;
+  Bool hasToken = False;
+  Unit run(){
+    if(hasToken == False){
+      await hasToken == True;
+      await s!resources(id);
+      hasToken = False;
+      await next!= null;
+      next!setTokenAtt();
+    }
+    finished = True;
+  }
+
+  Int getId(){
+    return this.id;
+  }
+
+  Unit setNextNode(Node n) {
+    next = n;
+  }
+
+  Unit isFinished() {
+     await finished == True;
+     //return;
+  }
+
+  Unit setTokenAtt(){
+    this.hasToken = True;
+  }
+}
+
+{
+  //Node n = new NodeImpl();
+  //Node s = new local NodeImpl();
+  Runtokenring rt = new RuntokenringImpl();
+  Int i = 1000;
+  while(i>0){
+    println("Round number: " + toString(i));
+    Fut<Node> f = rt!test();
+    await f?;
+    Node m = f.get;
+    Fut<Unit> f2 = m!isFinished();
+    await f2?;
+    i = i-1;
+  }
+}

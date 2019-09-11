@@ -1,0 +1,140 @@
+module Bully;
+
+def Int numNodes() = 10;
+
+interface Runelection{
+  Unit test();
+}
+interface Node {
+  Unit setLeader(Node lead);
+  Unit electLeader();
+  Unit setNodes(List<Node> n);
+  Unit start();
+  String setelectmsg();
+  Int getId();
+}
+
+class RunelectionImpl implements Runelection{
+  List<Node> nodes = Nil;
+  Int num = numNodes();
+  List<Node> temp = Nil;
+  Node n;
+  Int id = 0 ;
+
+  Unit test(){
+    while (id < num) {
+    n = new NodeImpl(id);
+    nodes = Cons(n,nodes);
+    id = id +1;
+  }
+
+  assert nodes != Nil;
+
+  nodes = reverse(nodes);
+  temp = nodes;
+
+  while(temp != Nil){
+    head(temp)!setNodes(nodes);
+    temp = tail(temp);
+  }
+
+
+  await head(nodes)!start();
+
+  id = 0;
+  nodes = Nil;
+  temp = Nil;
+  }
+}
+
+class NodeImpl(Int id) implements Node {
+  List<Node> nodes = Nil;
+  Node leader = null;
+  Bool electmsg = False;
+  Bool recvmsg = False;
+
+  Unit start(){
+    this!setelectmsg();
+    await this.leader != null;
+  }
+
+  Unit run(){
+    if(electmsg == False){
+      await electmsg == True;
+      this!electLeader();
+    }
+  }
+
+  Unit setLeader(Node lead){
+    this.leader = lead;
+  }
+
+  Unit setNodes(List<Node> n) {
+      this.nodes = n;
+    }//end of setNodes;
+
+  String setelectmsg(){
+    this.electmsg = True;
+    return "Ok";
+  }
+
+  Node getLeader(){
+    return this.leader;
+  }
+  Int getId(){
+    return this.id;
+  }
+
+
+  Unit electLeader() {
+    await nodes != Nil;
+    List<Node> temp = nodes;
+    while(temp != Nil){
+      Fut<Int> futId = head(temp)!getId();
+      await futId?;
+      Int nodeId = futId.get;
+      if(nodeId > this.id){
+        //send message
+        Fut<String> futstr = head(temp)!setelectmsg();
+        await futstr?;
+        String str = futstr.get;
+        if(str == "Ok"){
+          this.recvmsg = True;
+        }
+        else{
+          skip;
+        }
+        temp = tail(temp);
+      }
+      else{
+        temp = tail(temp);
+      }
+    }
+    if(recvmsg == False){
+      leader = this;
+      temp = nodes;
+      while(temp!=Nil){
+        head(temp)!setLeader(this);
+        temp = tail(temp);
+      }
+    }
+
+    await this.leader != null;
+
+    //Fut<Int> futleaderId = this.leader!getId();
+    //await futleaderId?;
+    //Int leaderId = futleaderId.get;
+
+    //println("The leader for: " + toString(this.id) + " is: " + toString(leaderId));
+
+  }// end of findLeader()
+} //end of class
+
+{
+  Int i = 1000;
+  Runelection re = new RunelectionImpl();
+  while(i > 0){
+    await re!test();
+    i = i - 1;
+  }
+}

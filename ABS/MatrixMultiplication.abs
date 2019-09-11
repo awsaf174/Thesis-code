@@ -1,0 +1,52 @@
+module Matmul;
+
+def List<List<Int>> transpose(List<List<Int>> matrix) =  rowsdecoy(matrix, Nil);
+
+def List<List<Int>> rowsdecoy(List<List<Int>> matrix, List<List<Int>> result) =
+  case matrix{
+    Nil => reverserows(result, Nil);
+    Cons(row, otherrows) => rows(row, otherrows, result);
+  };
+
+def List<List<Int>> rows(List<Int> row, List<List<Int>> otherrows, List<List<Int>> result) = let (List<List<Int>> newresult) = makecolumn(row, result)
+  in rowsdecoy(otherrows, newresult);
+
+def List<List<Int>> makecolumn(List<Int> row, List<List<Int>> result) =
+  case row{
+    Nil => result;
+    Cons(rowH, otherrows) => case result{
+      Nil => Cons(list[rowH], makecolumn(otherrows, Nil));
+      Cons(resultrow, otherresultrows) => Cons(Cons(rowH, resultrow), makecolumn(otherrows, otherresultrows));
+    };
+  };
+
+def List<List<Int>> reverserows(List<List<Int>> matrix, List<List<Int>> result) =
+  case matrix{
+    Nil => reverse(result);
+    Cons(row, otherrows) => reverserows(otherrows, Cons(reverse(row), result));
+  };
+
+def List<List<Int>> matmul(List<List<Int>> matrixOne, List<List<Int>> matrixTwo) = multiply(matrixOne, transpose(matrixTwo));
+
+def List<List<Int>> multiply(List<List<Int>> matrixOne, List<List<Int>> matrixTwo) =
+  case matrixOne{
+    Nil => Nil;
+    Cons(matrixOneRow, matrixOneOtherRows) => case matrixTwo{
+      Cons(matrixTwoRow, matrixTwoOtherRows) => Cons(calcRow(matrixOneRow, matrixTwo), multiply(matrixOneOtherRows, matrixTwo));
+    };
+  };
+def List<Int> calcRow(List<Int> matrixOneRow, List<List<Int>>matrixTwo) =
+  case matrixTwo{
+    Nil => Nil;
+    Cons(matrixTwoRow, matrixTwoOtherRows) => Cons(calCol(matrixOneRow, matrixTwoRow), calcRow(matrixOneRow, matrixTwoOtherRows));
+  };
+
+def Int calCol(List<Int>matrixOneRow, List<Int> matrixTwoRow) =
+  case matrixOneRow{
+    Nil => case matrixTwoRow{
+      Nil => 0;
+    };
+    Cons(matrixOneRowH, matrixOneRowT) => case matrixTwoRow{
+      Cons(matrixTwoRowH, matrixTwoRowT) => matrixOneRowH * matrixTwoRowH + calCol(matrixOneRowT, matrixTwoRowT);
+    };
+  };

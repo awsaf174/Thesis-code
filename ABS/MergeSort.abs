@@ -1,0 +1,32 @@
+module MergeSort;
+
+
+def List<Int> mergesort(List<Int> l) = let (Pair<List<Int>, List<Int>> p) = splitdecoy(l)
+               in case l{
+                 Nil => Nil;
+                 Cons(x, Nil) => Cons(x, Nil);
+                 _ => mergedecoy(mergesort(fst(p)), mergesort(snd(p)));
+               };
+
+def Pair<List<Int>, List<Int>> splitdecoy(List<Int> l) = splitter(l, l, Nil);
+
+def Pair<List<Int>, List<Int>> splitter(List<Int>l1, List<Int>l2, List<Int> acc) =
+  case l1{
+    Nil	=> 	Pair(reverse(acc), l2);
+    Cons(x, Nil) => Pair(reverse(acc),l2);
+    Cons(x, Cons(y, xs)) => splitter(xs, tail(l2), Cons(head(l2),acc));
+  };
+
+def List<Int> mergedecoy(List<Int> lhalf, List<Int> rhalf) = merge(lhalf, rhalf, Nil);
+
+def List<Int> merge(List<Int> lhalf, List<Int> rhalf, List<Int> acc) =
+  case lhalf{
+    Nil => case rhalf{
+      Nil => reverse(acc);
+      Cons(r,rs) => concatenate(reverse(acc), rhalf);
+    };
+    Cons(l,ls) => case rhalf{
+      Nil => concatenate(reverse(acc), lhalf);
+      Cons(r,rs) => if (l<r) then merge(ls, rhalf, Cons(l, acc)) else merge(rs, lhalf, Cons(r, acc));
+    };
+  };

@@ -1,0 +1,10 @@
+module Fibonacci;
+
+def Int fibstart(Int n) = fibseq(n, 1, 0);
+
+def Int fibseq(Int n, Int next, Int result) = if(n>0) then fibseq(n-1, result, next+result) else result;
+
+
+{
+    fibstart(10);
+}
