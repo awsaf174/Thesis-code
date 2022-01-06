@@ -1,5 +1,5 @@
 # Description
-Code written for benchmarking 3 different backends - ABS, Erlang and Haskel.
+Code written for benchmarking 3 different backends - ABS, Erlang and Haskel - for my # Master thesis.
 # Programs implemented
   1. The Fibonacci Sequence
   2. Merge Sort
